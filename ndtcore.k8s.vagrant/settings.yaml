@@ -1,0 +1,41 @@
+---
+# Cluster name used to group nodes in VirtualBox
+cluster_name: NDTCore Cluster
+
+# Network configuration (All IPs/CIDRs should be private and allowed in /etc/vbox/networks.conf)
+network:
+  control_ip: 10.0.0.10  # Control Plane IP
+  dns_servers:
+    - 8.8.8.8
+    - 1.1.1.1
+  pod_cidr: 172.16.1.0/16
+  service_cidr: 172.17.1.0/18
+
+# Node configuration
+nodes:
+  master:
+    cpu: 2
+    memory: 4096
+  workers:
+    count: 1
+    cpu: 1
+    memory: 2048
+
+# Software versions
+software:
+  box: bento/ubuntu-24.04
+  os: xUbuntu_24.04
+  kubernetes: 1.31.0-*
+  calico: 3.26.0
+  dashboard: 2.7.0  # Set empty ("") to skip installation
+
+# Environment variables (Uncomment if needed)
+# environment: |
+#   HTTP_PROXY=http://my-proxy:8000
+#   HTTPS_PROXY=http://my-proxy:8000
+#   NO_PROXY=127.0.0.1,localhost,master-node,node01,node02,node03
+
+# Shared folders from host to VM (Uncomment if needed)
+# shared_folders:
+#   - host_path: ../images
+#     vm_path: /vagrant/images

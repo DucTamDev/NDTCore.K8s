@@ -1,0 +1,54 @@
+require "yaml"
+
+# Configuration
+CLUSTER_NAME = "NDTCore Cluster"
+CONTROL_IP_PREFIX = "10.0.0."
+CONTROL_IP_SUFFIX = 10
+CONTROL_IP = "#{CONTROL_IP_PREFIX}#{CONTROL_IP_SUFFIX}"
+DNS_SERVERS = ["8.8.8.8", "1.1.1.1"]
+POD_CIDR = "192.168.0.0/16"
+SERVICE_CIDR = "10.96.0.0/12"
+NUM_WORKER_NODES = 1
+
+# Hardware Configuration
+MASTER_CONFIG = { "cpu" => 2, "memory" => 4096 }
+WORKER_CONFIG = { "cpu" => 1, "memory" => 2048 }
+
+# Software Versions
+BOX = "bento/ubuntu-24.04"
+KUBERNETES_VERSION = "1.31.0-*"
+CALICO_VERSION = "3.26.0"
+DASHBOARD_VERSION = "2.7.0"
+
+Vagrant.configure("2") do |config|
+    config.vm.box = BOX + (`uname -m`.strip == "aarch64" ? "-arm64" : "")
+    config.vm.box_check_update = true
+
+    def configure_vm(vm, name, config, ip, shared_folders)
+        vm.vm.hostname = name
+        vm.vm.network "private_network", ip: ip
+        vm.vm.provider "virtualbox" do |vb|
+            vb.cpus = config["cpu"]
+            vb.memory = config["memory"]
+            vb.customize ["modifyvm", :id, "--groups", "/#{CLUSTER_NAME}"] if CLUSTER_NAME.strip != ""
+        end
+
+        if shared_folders.is_a?(Array)
+            shared_folders.each do |shared_folder|
+                vm.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
+            end
+        end
+    end
+
+    # Create Control Plane (Master Node)
+    config.vm.define "nodemaster" do |nodemaster|
+        configure_vm(nodemaster, "nodemaster", MASTER_CONFIG, CONTROL_IP, defined?(SHARED_FOLDERS) ? SHARED_FOLDERS : [])
+    end
+
+    # Create Worker Nodes
+    (1..NUM_WORKER_NODES).each do |i|
+        config.vm.define "node0#{i}" do |node|
+            configure_vm(node, "node0#{i}", WORKER_CONFIG, "#{CONTROL_IP_PREFIX}#{CONTROL_IP_SUFFIX + i}", defined?(SHARED_FOLDERS) ? SHARED_FOLDERS : [])
+        end
+    end
+end
