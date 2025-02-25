@@ -318,22 +318,10 @@ nodemaster   Ready      control-plane   5m      v1.32.*
 
 ## 3. Thêm Worker Node (`node01`) vào Cluster
 
-Trên **nodemaster**, lấy lệnh `kubeadm join`:
+Trên **node01**, Copy lệnh này trong file join.sh mà nodemaster đã tạo:
 
 ```bash
-kubeadm token create --print-join-command
-```
-
-Ví dụ:
-
-```
-kubeadm join 192.168.1.100:6443 --token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:<hash>
-```
-
-Sau đó, trên **node01**, chạy lệnh này:
-
-```bash
-sudo kubeadm join 192.168.1.100:6443 --token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:<hash>
+kubeadm join 10.0.0.10:6443 --token r5uiuy.qar4qofq0x7syw2v --discovery-token-ca-cert-hash sha256:5b4e9075d05ae72c76aa2acc266589d1163471dcf616ab34265a1461545caa8e 
 ```
 
 ---

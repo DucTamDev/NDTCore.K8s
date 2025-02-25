@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vue-service
+spec:
+  selector:
+    app: vue-app
+  ports:
+    - protocol: TCP
+      port: 80 # Cổng của Service trong cluster
+      targetPort: 80 # Cổng container đang chạy Nginx
+      nodePort: 30007 # Cổng cố định để truy cập từ ngoài (tùy chọn từ 30000-32767)
+  type: NodePort # Dùng NodePort để có thể truy cập từ bên ngoài

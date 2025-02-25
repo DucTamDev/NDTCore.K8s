@@ -19,6 +19,10 @@ BOX = "bento/ubuntu-24.04"
 KUBERNETES_VERSION = "1.31.0-*"
 CALICO_VERSION = "3.26.0"
 DASHBOARD_VERSION = "2.7.0"
+SHARED_FOLDERS = [
+    { "host_path" => "./configs", "vm_path" => "/vagrant/configs" },
+    # { "host_path" => "./data", "vm_path" => "/vagrant/data" }
+]
 
 Vagrant.configure("2") do |config|
     config.vm.box = BOX + (`uname -m`.strip == "aarch64" ? "-arm64" : "")
@@ -27,6 +31,7 @@ Vagrant.configure("2") do |config|
     def configure_vm(vm, name, config, ip, shared_folders)
         vm.vm.hostname = name
         vm.vm.network "private_network", ip: ip
+        vm.vm.network "public_network", bridge: "wlan0" 
         vm.vm.provider "virtualbox" do |vb|
             vb.cpus = config["cpu"]
             vb.memory = config["memory"]
